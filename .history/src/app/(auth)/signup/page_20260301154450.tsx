@@ -4,8 +4,11 @@ import React from 'react'
 
 const Page = async () => {
     await requireUnAuth()
-        return <RegisterForm />
+        return (
+        <div>
+            <RegisterForm />
 
+    )
 }
 
 export default Page

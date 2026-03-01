@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import Image from "next/image";
 
 
 
@@ -96,12 +95,7 @@ export function RegisterForm() {
                                         type="button"
                                         disabled={isPending}
                                     >
-                                        <Image
-                                            alt="Google"
-                                            src="/logos/google.svg"
-                                            width={20}
-                                            height={20}
-                                        />
+                                        
                                         Continue with Google
                                     </Button>
                                 </div>

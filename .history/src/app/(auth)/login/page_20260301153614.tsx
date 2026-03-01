@@ -4,9 +4,13 @@ import React from 'react'
 
 const Page = async () => {
     await requireUnAuth();
-
-    return <LoginForm />
-
+    return (
+        <div
+        className='bg-muted flex min-h-svh flex-col justify-center gap-6 p-6 md'
+        >
+            <LoginForm />
+        </div>
+    )
 }
 
 export default Page

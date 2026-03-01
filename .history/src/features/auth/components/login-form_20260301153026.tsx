@@ -10,54 +10,44 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import Image from "next/image";
 
 
 
 
-const RegisterSchema = z.object({
+
+const loginSchema = z.object({
     email: z.email("Please enter a valid email address"),
     password: z.string().min(5, "Password is required"),
-    confirmPassword: z.string(),
-})
-.refine((data) => data.password === data.password, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"]
-})
+});
 
+type LoginFormValues = z.infer<typeof loginSchema>;
 
-
-type RegisterFormValues = z.infer<typeof RegisterSchema>;
-
-export function RegisterForm() {
+export function LoginForm() {
     const router = useRouter();
 
-    const form = useForm<RegisterFormValues>({
-        resolver: zodResolver(RegisterSchema),
+    const form = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema),
         defaultValues: {
             email: "",
             password: "",
-            confirmPassword: ""
         },
     });
 
-    const onSubmit = async (values: RegisterFormValues) => {
-        await authClient.signUp.email({
-            name: values.email,
+    const onSubmit = async (values: LoginFormValues) => {
+        await authClient.signIn.email({
             email: values.email,
             password: values.password,
             callbackURL: "/",
-        },
-        {
+        }, {
             onSuccess: () => {
                 router.push("/");
             },
             onError: (ctx) => {
                 toast.error(ctx.error.message)
-            }
-        }
-    )
-    }
+            },
+        });
+    };
+    
     const isPending = form.formState.isSubmitting;
 
     return (
@@ -65,10 +55,10 @@ export function RegisterForm() {
             <Card>
                 <CardHeader className="text-center">
                     <CardTitle>
-                        Get Started
+                        Welcome back
                     </CardTitle>
                     <CardDescription>
-                        Create your account to get started
+                        Login to continue
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -83,10 +73,7 @@ export function RegisterForm() {
                                         disabled={isPending}
                                     >
                                         <Image
-                                            alt="GitHub"
-                                            src="/logos/github.svg"
-                                            width={20}
-                                            height={20}
+                                            alt=
                                         />
                                         Continue with GitHub
                                     </Button>
@@ -96,12 +83,6 @@ export function RegisterForm() {
                                         type="button"
                                         disabled={isPending}
                                     >
-                                        <Image
-                                            alt="Google"
-                                            src="/logos/google.svg"
-                                            width={20}
-                                            height={20}
-                                        />
                                         Continue with Google
                                     </Button>
                                 </div>
@@ -140,35 +121,18 @@ export function RegisterForm() {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
-                                        control={form.control}
-                                        name="password"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Confirm Password</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="password"
-                                                        placeholder="********"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
                                     <Button 
                                         type="submit"
                                         className="w-full"
                                         disabled={isPending}
                                         >
-                                            Sign Up
+                                            Login
                                     </Button>
                                 </div>
                                 <div className="text-center text-sm">
-                                    Already have an account?{" "}
-                                    <Link href='/login' className="underline underline-offset-4">
-                                        Login
+                                    Don&apos;t have an account?{" "}
+                                    <Link href='/signup' className="underline underline-offset-4">
+                                        Sign up
                                     </Link>
                                 </div>
                             </div>
