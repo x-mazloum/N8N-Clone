@@ -1,26 +1,31 @@
 "use client";
 
 import { NodeProps } from "@xyflow/react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { PlaceholderNode } from "./react-flow/placeholder-node";
 import { PlusIcon } from "lucide-react";
 import { WorkflowNode } from "./workflow-node";
+import { NodeSelector } from "./node-selector";
 
 
 export const InitialNode = memo((props: NodeProps) => {
+    const [selectorOpen, setSelectorOpen] = useState(false);
+    
     return (
-        <WorkflowNode 
-            showToolbar={false}
-            >
-            <PlaceholderNode
-                {...props}
-                onClick={() => {}}
+        <NodeSelector open={selectorOpen} onOpenChange={setSelectorOpen}>
+            <WorkflowNode 
+                showToolbar={false}
                 >
-                <div className="flex items-center justify-center cursor-pointer">
-                    <PlusIcon className="size-4" />
-                </div>
-            </PlaceholderNode>
-        </WorkflowNode>
+                <PlaceholderNode
+                    {...props}
+                    onClick={() => setSelectorOpen(true)}
+                    >
+                    <div className="flex items-center justify-center cursor-pointer">
+                        <PlusIcon className="size-4" />
+                    </div>
+                </PlaceholderNode>
+            </WorkflowNode>
+        </NodeSelector>
     )
 })
 
