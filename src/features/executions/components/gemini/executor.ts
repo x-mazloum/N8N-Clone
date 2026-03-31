@@ -1,0 +1,114 @@
+import type { NodeExecutor } from "@/features/executions/types";
+import { NonRetriableError } from "inngest";
+import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import HandleBars from "handlebars";
+import { geminiChannel } from "@/inngest/channels/gemini";
+import { generateText } from "ai";
+
+HandleBars.registerHelper("json", (context) => {
+    const jsonString = JSON.stringify(context, null, 2);
+    const safeString = new HandleBars.SafeString(jsonString);
+    
+    return safeString;
+});
+
+type GeminiData = {
+    variableName?: string;
+    userPrompt?: string;
+    systemPrompt?: string;
+};
+
+export const geminiExecutor: NodeExecutor<GeminiData> = async ({
+    data,
+    nodeId,
+    context,
+    step,
+    publish,
+}) => {
+  // Publish "loading" state for gemini event
+    await publish(
+        geminiChannel().status({
+            nodeId,
+            status: "loading",
+        }),
+    );
+
+    if(!data.variableName) {
+        await publish(
+            geminiChannel().status({
+                nodeId,
+                status: "error",
+            }),
+        );
+        throw new NonRetriableError("Gemini node: Variable name is missing")
+    }
+
+    if(!data.userPrompt) {
+        await publish(
+            geminiChannel().status({
+                nodeId,
+                status: "error",
+            }),
+        );
+        throw new NonRetriableError("Gemini node: User Prompt is missing")
+    }
+
+    const systemPrompt = data.systemPrompt ?
+                HandleBars.compile(data.systemPrompt)(context)
+                : "You are a helpful assistant.";
+    const userPrompt = HandleBars.compile(data.userPrompt)(context);
+
+    // TODO: Fetch credential that user selected
+
+    const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
+
+    const google = createGoogleGenerativeAI({
+        apiKey: credentialValue,
+    });
+
+    try {
+        const { steps } = await step.ai.wrap(
+            "gemini-generate-text",
+            generateText,
+            {
+                model: google("gemma-3-27b-it"),
+                system: systemPrompt,
+                prompt: userPrompt,
+                experimental_telemetry: {
+                    isEnabled: true,
+                    recordInputs: true,
+                    recordOutputs: true,
+                },
+            },
+        )
+
+        const text = 
+                steps[0].content[0].type === "text"
+                ? steps[0].content[0].text
+                : "";
+
+        await publish(
+            geminiChannel().status({
+                nodeId,
+                status: "success",
+        }),
+    );
+
+    return {
+        ...context,
+        [data.variableName]: {
+            text,
+        },
+    }
+    } catch (error) {
+        await publish(
+            geminiChannel().status({
+                nodeId,
+                status: "error",
+            }),
+        );
+        throw error;
+    }
+};
+// there was a bug when executing that the last node overrides the nodes before so only the data of the last node is displayed in inngest(key collision)
+// this approach of the variable name fixed this bug explain it in details
