@@ -26,13 +26,13 @@ const triggerNodes: NodeTypeOption[] = [
         type: NodeType.GOOGLE_FORM_TRIGGER,
         label: "Google Form",
         description: "Runs the flow when a Google Form is submitted",
-        icon: "/public/logos/googleform.svg",
+        icon: "/googleform.svg",
     },
     {
         type: NodeType.STRIPE_TRIGGER,
         label: "Stripe Event",
         description: "Runs the flow when a Stripe event is captured",
-        icon: "/public/logos/stripe.svg",
+        icon: "/logos/stripe.svg",
     },
 ];
 
@@ -43,7 +43,25 @@ const executionNodes: NodeTypeOption[] = [
         label: "HTTP Request",
         description: "Makes an HTTP Request",
         icon: GlobeIcon,
-    }
+    },
+    {
+        type: NodeType.GEMINI,
+        label: "Gemini",
+        description: "Use Google Gemini to generate text",
+        icon: "/logos/gemini.svg",
+    },
+    {
+        type: NodeType.OPENAI,
+        label: "OpenAi",
+        description: "Use OpenAI to generate text",
+        icon: "/openai.svg",
+    },
+    {
+        type: NodeType.ANTHROPIC,
+        label: "Anthropic",
+        description: "Use Anthropic to generate text",
+        icon: "/anthropic.svg",
+    },
 ];
 
 interface NodeSelectorProps {
