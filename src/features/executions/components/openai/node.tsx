@@ -9,6 +9,7 @@ import { OpenAi_CHANNEL_NAME } from "@/inngest/channels/openai";
 import { fetchOpenAiRealtimeToken } from "./actions";
 
 type OpenAiNodeData = {
+    credentialId?: string;
     variableName?: string;
     systemPrompt?: string;
     userPrompt?: string;

@@ -5,7 +5,6 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { generateSlug } from "random-word-slugs"
 import z from "zod";
 import type { Node, Edge } from "@xyflow/react";
-import { inngest } from "@/inngest/client";
 import { sendWorkflowExecution } from "@/inngest/utils";
 
 
