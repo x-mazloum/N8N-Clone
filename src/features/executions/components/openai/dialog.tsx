@@ -12,7 +12,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { CredentialType } from "@/generated/prisma/enums";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -25,6 +28,7 @@ const formSchema = z.object({
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
             message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores",
         }),
+        credentialId: z.string().min(1, "Credential is required"),
         systemPrompt: z.string().optional(),
         userPrompt: z.string().min(1, "User prompt is required"),
 });
@@ -48,9 +52,15 @@ export const OpenAiDialog = ({
     defaultValues = {},
 }: Props) => {
 
+        const { 
+                data: credentials, 
+                isLoading: isLoadingCredentials 
+            } = useCredentialsByType(CredentialType.OPENAI);
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            credentialId: defaultValues.credentialId || "",
             variableName: defaultValues.variableName || "",
             systemPrompt: defaultValues.systemPrompt || "",
             userPrompt: defaultValues.userPrompt || "",
@@ -61,6 +71,7 @@ export const OpenAiDialog = ({
     useEffect(() => {
         if(open) {
             form.reset({
+                credentialId: defaultValues.credentialId || "",
                 variableName: defaultValues.variableName || "",
                 systemPrompt: defaultValues.systemPrompt || "",
                 userPrompt: defaultValues.userPrompt || "",
@@ -109,6 +120,46 @@ export const OpenAiDialog = ({
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
+                            )}
+                            />
+
+                        <FormField
+                                control={form.control}
+                                name="credentialId"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Open AI Credential</FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        disabled={isLoadingCredentials || !credentials?.length}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="select a credential"/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {credentials?.map((credential) => (
+                                                <SelectItem
+                                                    key={credential.id}
+                                                    value={credential.id}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <Image
+                                                            src="/openai.svg"
+                                                            alt="Gemini"
+                                                            width={16}
+                                                            height={16}
+                                                        />
+                                                        {credential.name}
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                            </FormItem>
                             )}
                             />
                         

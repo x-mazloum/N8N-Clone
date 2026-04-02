@@ -36,7 +36,7 @@ export const BaseTriggerNode = memo(({
             return updatedNodes;
         })
         setEdges((edges) => {
-            const updatedEdges = edges.filter((edge) => edge.source !== id && edge.target ! == id);
+            const updatedEdges = edges.filter((edge) => edge.source !== id && edge.target !== id);
             return updatedEdges;
         })
     };
