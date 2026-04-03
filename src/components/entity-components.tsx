@@ -17,7 +17,7 @@ type EntityHeadersProps = {
 } & (
     | { onNew: () => void; newButtonHref?: never}
     | { newButtonHref: string; onNew?: never}
-    | { onNew?: never; newButtomHref?: never}
+    | { onNew?: never; newButtonHref?: never}
 );
 
 export const EntityHeader= ({
