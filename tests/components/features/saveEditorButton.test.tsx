@@ -9,10 +9,14 @@ vi.mock("@/features/workflows/hooks/use-workflows", () => ({
   useUpdateWorkflow: vi.fn(),
 }));
 
-vi.mock("jotai", () => ({
-  useAtomValue: vi.fn(),
-}));
+vi.mock("jotai", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("jotai")>();
 
+  return {
+    ...actual,
+    useAtomValue: vi.fn(),
+  };
+});
 const mutate = vi.fn();
 const getNodes = vi.fn();
 const getEdges = vi.fn();
@@ -57,7 +61,7 @@ describe("EditorSaveButton", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: /save/i,
+        name: /save$/i,
       }),
     );
 
@@ -78,7 +82,7 @@ describe("EditorSaveButton", () => {
 
     render(<EditorSaveButton workflowId="workflow-1" />);
 
-    await user.click(screen.getByRole("button", { name: /save /i }));
+    await user.click(screen.getByRole("button", { name: /save$/i }));
 
     expect(mutate).not.toHaveBeenCalled();
   });

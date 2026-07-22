@@ -28,8 +28,17 @@ vi.mock("@/features/editor/components/execute-workflow-button", () => ({
   executeWorkflowButton: () => <button type="submit"> Execute Workflow</button>,
 }));
 
-vi.mock("jotai", () => ({
-  useSetAtom: vi.fn(),
+vi.mock("jotai", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("jotai")>();
+
+  return {
+    ...actual,
+    useAtomValue: vi.fn(),
+  };
+});
+
+vi.mock("@/features/editor/components/execute-workflow-button", () => ({
+  ExecuteWorflowButton: () => <button type="button">Execute Workflow</button>,
 }));
 
 const mockWorkflow = (
@@ -84,7 +93,7 @@ describe("Editor", () => {
 
     expect(
       screen.queryByRole("button", {
-        name: /execute workflow /i,
+        name: /execute workflow/i,
       }),
     ).not.toBeInTheDocument();
   });

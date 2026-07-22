@@ -27,7 +27,7 @@ describe("ExecuteWorkflowButton", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: /execute workflow /i,
+        name: /execute workflow$/i,
       }),
     );
 

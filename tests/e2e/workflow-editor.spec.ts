@@ -11,6 +11,10 @@ test("saves a workflow and keep it after reloading", async ({ page }) => {
     })
     .click();
 
+    console.log("Current URL:", page.url());
+
+    console.log("PAGE:", await page.locator("body").innerText());
+
   // Confirm editor opened
   await expect(page).toHaveURL(/\/workflows\/.+/);
 

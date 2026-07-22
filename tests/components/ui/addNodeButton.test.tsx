@@ -4,21 +4,32 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AddNodeButton } from "@/features/editor/components/add-node-button";
 
-vi.mock("@/features/editor/components/add-node-button", () => ({
-  NodeSelector: ({ open }: { open: boolean }) => {
-    if (!open) return null;
+import { ReactFlowProvider } from "@xyflow/react";
 
-    return (
-      <div role="dialog" aria-label="Node Selector">
-        Select a node
-      </div>
-    );
-  },
-}));
+// vi.mock("@/features/editor/components/add-node-button", () => ({
+//   NodeSelector: ({ open }: { open: boolean }) => {
+//     if (!open) return null;
+
+//     return (
+//       <div role="dialog" aria-label="Node Selector">
+//         Select a node
+//       </div>
+//     );
+//   },
+// }));
+
+const renderAddNodeButton = () => {
+  return render(
+    <ReactFlowProvider>
+      <AddNodeButton />
+    </ReactFlowProvider>,
+  );
+};
+
 
 describe("AddNodeButton", () => {
   it("keeps the selector hidden initially", () => {
-    render(<AddNodeButton />);
+    renderAddNodeButton()
 
     expect(
       screen.queryByRole("dialog", {
@@ -29,6 +40,8 @@ describe("AddNodeButton", () => {
   it("opens the selector when clicked", async () => {
     const user = userEvent.setup();
 
+    renderAddNodeButton()
+
     await user.click(
       screen.getByRole("button", {
         name: /add node/i,
@@ -37,7 +50,7 @@ describe("AddNodeButton", () => {
 
     expect(
       screen.getByRole("dialog", {
-        name: /node selector/i,
+        name: /what triggers this workflow/i,
       }),
     ).toBeInTheDocument();
   });
