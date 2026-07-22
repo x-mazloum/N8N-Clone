@@ -1,29 +1,29 @@
 "use client";
 
-import { ExecutionStatus } from "@/generated/prisma/enums";
-import {
-    CheckCircle2Icon,
-    ClockIcon,
-    Loader2Icon,
-    XCircleIcon,
-} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import {
+  CheckCircle2Icon,
+  ClockIcon,
+  Loader2Icon,
+  XCircleIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useSuspenseExecution } from "@/features/executions/hooks/use-executions";
+import { ExecutionStatus } from "@/generated/prisma/enums";
 
 const getStatusIcon = (status: ExecutionStatus) => {
   switch (status) {
@@ -39,20 +39,20 @@ const getStatusIcon = (status: ExecutionStatus) => {
 };
 
 const formatStatus = (status: ExecutionStatus) => {
-    return status.charAt(0) + status.slice(1).toLowerCase();
+  return status.charAt(0) + status.slice(1).toLowerCase();
 };
 
 export const ExecutionView = ({ executionId }: { executionId: string }) => {
   const { data: execution } = useSuspenseExecution(executionId);
   const [showStackTrace, setShowStackTrace] = useState(false);
 
-    const duration = execution.completedAt
-        ? Math.round(
-            (new Date(execution.completedAt).getTime() -
-                new Date(execution.startedAt).getTime()) /
-                1000,
-            )
-        : null;
+  const duration = execution.completedAt
+    ? Math.round(
+        (new Date(execution.completedAt).getTime() -
+          new Date(execution.startedAt).getTime()) /
+          1000,
+      )
+    : null;
 
   return (
     <Card className="shadow-none">

@@ -1,7 +1,7 @@
-import type { ComponentProps, HTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
-import { NodeStatus } from "./node-status-indicator";
 import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
+import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
+import type { NodeStatus } from "./node-status-indicator";
 
 interface BaseNodeProps extends ComponentProps<"div"> {
   status?: NodeStatus;
@@ -16,20 +16,19 @@ export function BaseNode({ className, status, ...props }: BaseNodeProps) {
         // "[.react-flow\\_\\_node.selected_&]:shadow-lg",
         className,
       )}
-      tabIndex={0}
       {...props}
-      >
-        {props.children}
-        {status === "error" && (
-          <XCircleIcon className="absolute right-0.5 bottom-0.5 size-2 text-red-700 stroke-3"/>
-        )}
-        {status === "success" && (
-          <CheckCircle2Icon className="absolute right-0.5 bottom-0.5 size-2 text-green-700 stroke-3"/>
-        )}
-        {status === "loading" && (
-          <Loader2Icon className="absolute -right-0.5 -bottom-0.5 size-2 text-blue-700 stroke-3 animate-spin"/>
-        )}
-      </div>
+    >
+      {props.children}
+      {status === "error" && (
+        <XCircleIcon className="absolute right-0.5 bottom-0.5 size-2 text-red-700 stroke-3" />
+      )}
+      {status === "success" && (
+        <CheckCircle2Icon className="absolute right-0.5 bottom-0.5 size-2 text-green-700 stroke-3" />
+      )}
+      {status === "loading" && (
+        <Loader2Icon className="absolute -right-0.5 -bottom-0.5 size-2 text-blue-700 stroke-3 animate-spin" />
+      )}
+    </div>
   );
 }
 

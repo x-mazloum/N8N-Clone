@@ -1,5 +1,5 @@
-import { type ReactNode } from "react";
 import { LoaderCircle } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,6 @@ export type NodeStatusIndicatorProps = {
 
 export const SpinnerLoadingIndicator = ({
   children,
-  
 }: {
   children: ReactNode;
 }) => {
@@ -99,7 +98,7 @@ export const NodeStatusIndicator = ({
   status,
   variant = "border",
   children,
-  className
+  className,
 }: NodeStatusIndicatorProps) => {
   switch (status) {
     case "loading":
@@ -107,16 +106,26 @@ export const NodeStatusIndicator = ({
         case "overlay":
           return <SpinnerLoadingIndicator>{children}</SpinnerLoadingIndicator>;
         case "border":
-          return <BorderLoadingIndicator className={className}>{children}</BorderLoadingIndicator>;
+          return (
+            <BorderLoadingIndicator className={className}>
+              {children}
+            </BorderLoadingIndicator>
+          );
         default:
           return <>{children}</>;
       }
     case "success":
       return (
-        <StatusBorder className={cn("border-emerald-700/50", className)}>{children}</StatusBorder>
+        <StatusBorder className={cn("border-emerald-700/50", className)}>
+          {children}
+        </StatusBorder>
       );
     case "error":
-      return <StatusBorder className={cn("border-red-700/50", className)}>{children}</StatusBorder>;
+      return (
+        <StatusBorder className={cn("border-red-700/50", className)}>
+          {children}
+        </StatusBorder>
+      );
     default:
       return <>{children}</>;
   }

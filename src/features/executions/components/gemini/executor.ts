@@ -1,143 +1,135 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import HandleBars from "handlebars";
-import { geminiChannel } from "@/inngest/channels/gemini";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
+import HandleBars from "handlebars";
+import { NonRetriableError } from "inngest";
+import type { NodeExecutor } from "@/features/executions/types";
+import { geminiChannel } from "@/inngest/channels/gemini";
 import prisma from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
 
 HandleBars.registerHelper("json", (context) => {
-    const jsonString = JSON.stringify(context, null, 2);
-    const safeString = new HandleBars.SafeString(jsonString);
-    
-    return safeString;
+  const jsonString = JSON.stringify(context, null, 2);
+  const safeString = new HandleBars.SafeString(jsonString);
+
+  return safeString;
 });
 
 type GeminiData = {
-    credentialId?: string;
-    variableName?: string;
-    userPrompt?: string;
-    systemPrompt?: string;
+  credentialId?: string;
+  variableName?: string;
+  userPrompt?: string;
+  systemPrompt?: string;
 };
 
 export const geminiExecutor: NodeExecutor<GeminiData> = async ({
-    data,
-    nodeId,
-    userId,
-    context,
-    step,
-    publish,
+  data,
+  nodeId,
+  userId,
+  context,
+  step,
+  publish,
 }) => {
   // Publish "loading" state for gemini event
+  await publish(
+    geminiChannel().status({
+      nodeId,
+      status: "loading",
+    }),
+  );
+
+  if (!data.variableName) {
     await publish(
-        geminiChannel().status({
-            nodeId,
-            status: "loading",
-        }),
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
     );
+    throw new NonRetriableError("Gemini node: Variable name is missing");
+  }
 
-    if(!data.variableName) {
-        await publish(
-            geminiChannel().status({
-                nodeId,
-                status: "error",
-            }),
-        );
-        throw new NonRetriableError("Gemini node: Variable name is missing")
-    }
+  if (!data.userPrompt) {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw new NonRetriableError("Gemini node: User Prompt is missing");
+  }
+  if (!data.credentialId) {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw new NonRetriableError("Gemini node: Credential is missing");
+  }
 
-    if(!data.userPrompt) {
-        await publish(
-            geminiChannel().status({
-                nodeId,
-                status: "error",
-            }),
-        );
-        throw new NonRetriableError("Gemini node: User Prompt is missing")
-    }
-    if(!data.credentialId) {
-        await publish(
-            geminiChannel().status({
-                nodeId,
-                status: "error",
-            }),
-        );
-        throw new NonRetriableError("Gemini node: Credential is missing")
-    }
+  const systemPrompt = data.systemPrompt
+    ? HandleBars.compile(data.systemPrompt)(context)
+    : "You are a helpful assistant.";
+  const userPrompt = HandleBars.compile(data.userPrompt)(context);
 
-    const systemPrompt = data.systemPrompt ?
-                HandleBars.compile(data.systemPrompt)(context)
-                : "You are a helpful assistant.";
-    const userPrompt = HandleBars.compile(data.userPrompt)(context);
+  // TODO: Fetch credential that user selected
 
-    // TODO: Fetch credential that user selected
-
-    const credential = await step.run("get-credential", () => {
-        return prisma.credential.findUnique({
-            where: { id: data.credentialId, userId },
-        })
+  const credential = await step.run("get-credential", () => {
+    return prisma.credential.findUnique({
+      where: { id: data.credentialId, userId },
     });
-    
-    if(!credential){
-        await publish(
-            geminiChannel().status({
-                nodeId,
-                status: "error",
-            }),
-        );
-        throw new NonRetriableError("Gemini node: Credential not found");
-    }
+  });
 
-    
+  if (!credential) {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw new NonRetriableError("Gemini node: Credential not found");
+  }
 
-    const google = createGoogleGenerativeAI({
-        apiKey: decrypt(credential.value),
+  const google = createGoogleGenerativeAI({
+    apiKey: decrypt(credential.value),
+  });
+
+  try {
+    const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
+      model: google("gemma-3-27b-it"),
+      system: systemPrompt,
+      prompt: userPrompt,
+      experimental_telemetry: {
+        isEnabled: true,
+        recordInputs: true,
+        recordOutputs: true,
+      },
     });
 
-    try {
-        const { steps } = await step.ai.wrap(
-            "gemini-generate-text",
-            generateText,
-            {
-                model: google("gemma-3-27b-it"),
-                system: systemPrompt,
-                prompt: userPrompt,
-                experimental_telemetry: {
-                    isEnabled: true,
-                    recordInputs: true,
-                    recordOutputs: true,
-                },
-            },
-        )
+    const text =
+      steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
 
-        const text = 
-                steps[0].content[0].type === "text"
-                ? steps[0].content[0].text
-                : "";
-
-        await publish(
-            geminiChannel().status({
-                nodeId,
-                status: "success",
-        }),
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "success",
+      }),
     );
 
     return {
-        ...context,
-        [data.variableName]: {
-            text,
-        },
-    }
-    } catch (error) {
-        await publish(
-            geminiChannel().status({
-                nodeId,
-                status: "error",
-            }),
-        );
-        throw error;
-    }
+      ...context,
+      [data.variableName]: {
+        text,
+      },
+    };
+  } catch (error) {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw error;
+  }
 };
 // there was a bug when executing that the last node overrides the nodes before so only the data of the last node is displayed in inngest(key collision)
 // this approach of the variable name fixed this bug explain it in details

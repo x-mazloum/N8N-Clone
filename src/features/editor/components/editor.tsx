@@ -1,29 +1,29 @@
 "use client";
 import {
-  ReactFlow,
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  Background,
+  type Connection,
+  Controls,
   type Edge,
+  type EdgeChange,
+  MiniMap,
   type Node,
   type NodeChange,
-  type EdgeChange,
-  type Connection,
-  Background,
-  Controls,
-  MiniMap,
   Panel,
+  ReactFlow,
 } from "@xyflow/react";
 import { ErrorView, LoadingView } from "@/components/entity-components";
 import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 
 import "@xyflow/react/dist/style.css";
+import { useSetAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { nodeComponents } from "@/config/node-components";
-import { AddNodeButton } from "./add-node-button";
-import { useSetAtom } from "jotai";
-import { editorAtom } from "../store/atoms";
 import { NodeType } from "@/generated/prisma/enums";
+import { editorAtom } from "../store/atoms";
+import { AddNodeButton } from "./add-node-button";
 import { ExecuteWorflowButton } from "./execute-workflow-button";
 
 // Loading Editor
@@ -61,8 +61,8 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
   );
 
   const hasManualTrigger = useMemo(() => {
-    return nodes.some((node) => node.type === NodeType.MANUAL_TRIGGER)
-  },  [nodes]);
+    return nodes.some((node) => node.type === NodeType.MANUAL_TRIGGER);
+  }, [nodes]);
 
   return (
     <div className="size-full">
@@ -91,7 +91,7 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
           <Panel position="bottom-center">
             <ExecuteWorflowButton workflowId={workflowId} />
           </Panel>
-          )}
+        )}
       </ReactFlow>
     </div>
   );

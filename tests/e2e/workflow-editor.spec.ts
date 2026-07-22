@@ -1,51 +1,51 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("saves a workflow and keep it after reloading", async ({ page }) => {
+  // Arrange
+  await page.goto("/workflows");
 
-    // Arrange
-    await page.goto("/workflows");
+  // Act: Create Workflow
+  await page
+    .getByRole("button", {
+      name: /create workflow/i,
+    })
+    .click();
 
-    // Act: Create Workflow
-    await page.getByRole("button", {
-            name: /create workflow/i
-        }
-    ).click();
+  // Confirm editor opened
+  await expect(page).toHaveURL(/\/workflows\/.+/);
 
-    // Confirm editor opened
-    await expect(page).toHaveURL(/\/workflows\/.+/);
+  // Act: add a node
+  await page
+    .getByRole("button", {
+      name: /add node/i,
+    })
+    .click();
 
-    // Act: add a node
-    await page.getByRole("button", {
-        name: /add node/i
-    }).click();
+  await page
+    .getByText("Manual Trigger", {
+      exact: true,
+    })
+    .click();
 
-    await page
-        .getByText("Manual Trigger", {
-            exact: true
-        }).click();
+  // Act: Save
+  await page
+    .getByRole("button", {
+      name: /save/i,
+    })
+    .click();
 
-    // Act: Save
-    await page
-        .getByRole("button", {
-            name: /save/i
-        })
-        .click();
+  // Assert Save Result
 
-    // Assert Save Result
+  await expect(page.getByText("saved")).toBeVisible();
 
-    await expect(
-        page.getByText("saved")
-    ).toBeVisible();
+  // Reload the browser
+  await page.reload();
 
-    // Reload the browser
-    await page.reload();
+  // Assert Persistence
 
-    // Assert Persistence
-
-    await expect(
-        page.getByText("Manual Trigger", {
-            exact: true,
-        })
-    )
-    .toBeVisible();
-})
+  await expect(
+    page.getByText("Manual Trigger", {
+      exact: true,
+    }),
+  ).toBeVisible();
+});

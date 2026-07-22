@@ -1,19 +1,18 @@
-import { prefetch, trpc } from "@/trpc/server";
 import type { inferInput } from "@trpc/tanstack-react-query";
+import { prefetch, trpc } from "@/trpc/server";
 
-
-// no need for remembering the props u passed this will automatically infer that 
-// Infering the input type 
+// no need for remembering the props u passed this will automatically infer that
+// Infering the input type
 type Input = inferInput<typeof trpc.credentials.getMany>;
 
 // Prefetch all credentials
 
 export const prefetchCredentials = (params: Input) => {
-    return prefetch(trpc.credentials.getMany.queryOptions(params));
-}
+  return prefetch(trpc.credentials.getMany.queryOptions(params));
+};
 
 // Prefetch a single Credential
 
 export const prefetchCredential = (id: string) => {
-    return prefetch(trpc.credentials.getOne.queryOptions({ id }))
-}
+  return prefetch(trpc.credentials.getOne.queryOptions({ id }));
+};

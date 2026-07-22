@@ -4,8 +4,6 @@ import { executeWorkflow } from "@/inngest/functions";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
-    client: inngest,
-    functions: [
-        executeWorkflow,
-    ],
+  client: inngest,
+  functions: [executeWorkflow],
 });

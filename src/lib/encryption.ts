@@ -1,4 +1,4 @@
-import Cryptr from "cryptr"
+import Cryptr from "cryptr";
 
 const cryptr = new Cryptr(process.env.ENCRYPTION_KEY!);
 

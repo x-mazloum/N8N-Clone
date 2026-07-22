@@ -1,5 +1,5 @@
-import { sendWorkflowExecution } from "@/inngest/utils";
 import { type NextRequest, NextResponse } from "next/server";
+import { sendWorkflowExecution } from "@/inngest/utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,28 +14,25 @@ export async function POST(request: NextRequest) {
         },
         { status: 500 },
       );
-    };
+    }
     const body = await request.json();
-    
+
     const stripeData = {
-        // Event metadata
-        eventId: body.id,
-        eventType: body.type,
-        timestamp: body.created,
-        livemode: body.livemode,
-        raw: body.data?.object,
+      // Event metadata
+      eventId: body.id,
+      eventType: body.type,
+      timestamp: body.created,
+      livemode: body.livemode,
+      raw: body.data?.object,
     };
     // Trigger an Inngest job
     await sendWorkflowExecution({
-        workflowId,
-        initialData: {
-            stripe: stripeData,
-        }
+      workflowId,
+      initialData: {
+        stripe: stripeData,
+      },
     });
-    return NextResponse.json(
-      { success: true},
-      { status: 200 }
-    )
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Stripe webhook error:", error);
 

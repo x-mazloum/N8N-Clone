@@ -2,5 +2,5 @@ import { useQueryStates } from "nuqs";
 import { credentialsParams } from "../params";
 
 export const useCredentialsParams = () => {
-    return useQueryStates(credentialsParams);
-}
+  return useQueryStates(credentialsParams);
+};
