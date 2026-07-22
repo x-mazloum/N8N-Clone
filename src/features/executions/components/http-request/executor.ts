@@ -87,7 +87,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async({
 
             const response = await ky(endpoint, options);
             const contentType = response.headers.get("content-type");
-            const responseData = contentType?.includes("applicaton/json")
+            const responseData = contentType?.includes("application/json")
                         ? await response.json()
                         : await response.text();
 

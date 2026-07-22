@@ -10,7 +10,7 @@ export const ExecuteWorflowButton = ({ workflowId } : { workflowId : string}) =>
         executeWorflow.mutate({ id: workflowId})
     }
     return (
-        <Button size="lg" onClick={handleExecute} disabled={executeWorflow.isPending}>
+        <Button aria-label="Execute Workflow" size="lg" onClick={handleExecute} disabled={executeWorflow.isPending}>
             <FlaskConicalIcon className="size-4" />
             Execute workflow
         </Button>
