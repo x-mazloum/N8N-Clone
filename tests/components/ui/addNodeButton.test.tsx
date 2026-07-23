@@ -1,10 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-
-import { AddNodeButton } from "@/features/editor/components/add-node-button";
-
 import { ReactFlowProvider } from "@xyflow/react";
+import { describe, expect, it, vi } from "vitest";
+import { AddNodeButton } from "@/features/editor/components/add-node-button";
 
 // vi.mock("@/features/editor/components/add-node-button", () => ({
 //   NodeSelector: ({ open }: { open: boolean }) => {
@@ -26,10 +24,9 @@ const renderAddNodeButton = () => {
   );
 };
 
-
 describe("AddNodeButton", () => {
   it("keeps the selector hidden initially", () => {
-    renderAddNodeButton()
+    renderAddNodeButton();
 
     expect(
       screen.queryByRole("dialog", {
@@ -40,7 +37,7 @@ describe("AddNodeButton", () => {
   it("opens the selector when clicked", async () => {
     const user = userEvent.setup();
 
-    renderAddNodeButton()
+    renderAddNodeButton();
 
     await user.click(
       screen.getByRole("button", {

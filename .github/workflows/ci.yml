@@ -1,12 +1,31 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: nodebase-ci-shared-test-database
+  cancel-in-progress: false
+
 
 jobs:
   quality:
     name: Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
+    env:
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: http://127.0.0.1:3000
+      DISABLE_POLAR: "true"
 
     steps:
       - name: Checkout repository
@@ -23,6 +42,11 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_DIRECT_URL }}
 
       - name: Lint
         run: npm run lint
