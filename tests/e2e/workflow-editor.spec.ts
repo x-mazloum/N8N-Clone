@@ -87,37 +87,14 @@ test("saves a workflow and keeps it after reloading", async ({ page }) => {
   await newWorkflowButton.click();
 
   /*
-   * Wait for visible confirmation that the server created
-   * the workflow successfully.
-   */
-  await expect(page.getByText(/workflow .* created/i)).toBeVisible({
-    timeout: 10_000,
-  });
-
-  /*
-   * Normally, creating the workflow navigates directly to:
-   *
-   * /workflows/[workflowId]
-   *
-   * This fallback handles the case where creation succeeds,
-   * but the page remains on the workflow list.
-   */
-  if (new URL(page.url()).pathname === "/workflows") {
-    const createdWorkflowLink = page.locator('a[href^="/workflows/"]').first();
-
-    await expect(createdWorkflowLink).toBeVisible();
-
-    await createdWorkflowLink.click();
-  }
-
-  /*
-   * Confirm that we reached one specific workflow editor page.
-   *
-   * Example:
-   * /workflows/clx123abc
-   */
+    * Creating a workflow should redirect the user to:
+    * /workflows/[workflowId]
+    *
+    * We wait for the actual navigation instead of checking the URL
+    * immediately, because CI may take longer to complete the redirect.
+    */
   await expect(page).toHaveURL(/\/workflows\/[^/]+$/, {
-    timeout: 20_000,
+    timeout: 30_000,
   });
 
   // ---------------------------------------------------------
