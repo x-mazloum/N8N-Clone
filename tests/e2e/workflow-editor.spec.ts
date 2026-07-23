@@ -87,12 +87,12 @@ test("saves a workflow and keeps it after reloading", async ({ page }) => {
   await newWorkflowButton.click();
 
   /*
-    * Creating a workflow should redirect the user to:
-    * /workflows/[workflowId]
-    *
-    * We wait for the actual navigation instead of checking the URL
-    * immediately, because CI may take longer to complete the redirect.
-    */
+   * Creating a workflow should redirect the user to:
+   * /workflows/[workflowId]
+   *
+   * We wait for the actual navigation instead of checking the URL
+   * immediately, because CI may take longer to complete the redirect.
+   */
   await expect(page).toHaveURL(/\/workflows\/[^/]+$/, {
     timeout: 30_000,
   });
