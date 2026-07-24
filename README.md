@@ -4,14 +4,14 @@ A modern workflow automation interface inspired by n8n, built with **Next.js**, 
 
 The goal of this project was to practice building a complex React application with a node-based editor, workflow data modeling, authentication, credentials, executions, and scalable full-stack TypeScript architecture.
 
-## Live Demo
+## Live Demo     [![CI](https://github.com/x-mazloum/N8N-Clone/actions/workflows/ci.yml/badge.svg)](https://github.com/x-mazloum/N8N-Clone/actions/workflows/ci.yml)
 
 https://n8-n-clone-tau.vercel.app
 
 ```txt
 https://n8-n-clone-tau.vercel.app
 ```
-[![CI](https://github.com/x-mazloum/N8N-Clone/actions/workflows/ci.yml/badge.svg)](https://github.com/x-mazloum/N8N-Clone/actions/workflows/ci.yml)
+
 
 ## Tech Stack
 
